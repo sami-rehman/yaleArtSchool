@@ -1,8 +1,9 @@
 {
-  "name": "yale-art-website",
+  "name": "yale-art-school",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "author": "Sami, Zeineb, Despina",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -11,8 +12,10 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "leaflet": "^1.9.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.4.0"
   },
   "devDependencies": {

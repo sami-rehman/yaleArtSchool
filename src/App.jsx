@@ -1,10 +1,33 @@
-// App.jsx
+
 import React, { useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { XMarkIcon, MapIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+
+// Fix leaflet marker icons
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+const publicArtLocations = [
+  {
+    id: 1,
+    name: 'The Hanging Gardens of New Haven',
+    position: [41.3083, -72.9279],
+    description: 'Interactive community garden installation',
+    year: 2023
+  }
+];
 
 export default function App() {
   const [isWikiOpen, setIsWikiOpen] = useState(true);
+  const [editMode, setEditMode] = useState(false);
   const [expandedEvent, setExpandedEvent] = useState(null);
 
   const events = [
@@ -23,6 +46,22 @@ export default function App() {
       time: '3:00 PM - 7:00 PM EDT',
       location: '1156 Chapel Street',
       description: 'Photo critiques open to the SoA community during Spring 2025 semester'
+    },
+    {
+      id: 3,
+      date: 'Mar 28',
+      title: 'Graphic Design Thesis Presentations',
+      time: '10:00 AM - 12:00 PM EDT',
+      location: 'Green Hall Gallery',
+      description: 'Final thesis presentations from 2nd year MFA candidates'
+    },
+    {
+      id: 4,
+      date: 'Apr 2',
+      title: 'Painting/Printmaking Open Critique',
+      time: '2:00 PM - 5:00 PM EDT',
+      location: '353 Crown Street Studios',
+      description: 'Faculty-led critique session open to all art students'
     }
   ];
 
@@ -42,9 +81,24 @@ export default function App() {
       date: 'Submission Deadline: April 15, 2025',
       location: 'Yale Center for Environmental Justice',
       content: 'Seeking artists for Global Environmental Justice Conference exhibition'
+    },
+    {
+      id: 3,
+      type: 'Workshop',
+      title: 'Portfolio Building Intensive',
+      date: 'April 10, 2025',
+      location: 'Digital Media Lab',
+      content: 'Two-day workshop on creating effective artist portfolios'
+    },
+    {
+      id: 4,
+      type: 'Lecture',
+      title: 'Contemporary Art Lecture Series',
+      date: 'Weekly starting April 1',
+      location: 'Lecture Hall B',
+      content: 'Guest lectures from leading curators and art historians'
     }
   ];
-
   return (
     <div className="min-h-screen bg-gray-50 font-sans antialiased">
       {/* Wiki Notice Banner */}
@@ -55,7 +109,10 @@ export default function App() {
               <PencilSquareIcon className="h-5 w-5 text-yellow-700" />
               <p className="text-sm text-yellow-800">
                 This website is a collaborative wiki. Community members can{' '}
-                <button className="font-medium hover:text-yellow-900">edit content</button>.
+                <button className="font-medium hover:text-yellow-900">
+                  edit content
+                </button>
+                .
               </p>
             </div>
             <button
@@ -74,7 +131,18 @@ export default function App() {
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-12">
         {/* Happening at SOA Section */}
         <section>
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Happening at SOA</h1>
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">
+              Happening at SOA
+            </h1>
+            <button
+              onClick={() => setEditMode(!editMode)}
+              className="flex items-center w-32 bg-blue-600 text-white px-4 py-2 rounded-lg"
+            >
+              <PencilSquareIcon className="h-5 w-5 mr-2" />
+              {editMode ? 'Exit Edit' : 'Edit Page'}
+            </button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {events.map((event) => (
               <div
@@ -88,7 +156,11 @@ export default function App() {
                     </div>
                     <button
                       className="text-gray-400 hover:text-gray-600"
-                      onClick={() => setExpandedEvent(expandedEvent === event.id ? null : event.id)}
+                      onClick={() =>
+                        setExpandedEvent(
+                          expandedEvent === event.id ? null : event.id
+                        )
+                      }
                     >
                       {expandedEvent === event.id ? '−' : '+'}
                     </button>
@@ -112,7 +184,9 @@ export default function App() {
         {/* Community Bulletin Section */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Community Bulletin</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Community Bulletin
+            </h2>
             <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center">
               <PencilSquareIcon className="h-5 w-5 mr-2" />
               New Post
@@ -126,7 +200,9 @@ export default function App() {
                     <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-sm">
                       {bulletin.type}
                     </span>
-                    <span className="text-sm text-gray-500">{bulletin.date}</span>
+                    <span className="text-sm text-gray-500">
+                      {bulletin.date}
+                    </span>
                   </div>
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{bulletin.title}</h3>
@@ -141,7 +217,7 @@ export default function App() {
         </section>
 
         {/* Public Art Map Section */}
-        <section>
+        {/* <section>
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="aspect-video bg-gray-100 relative">
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
@@ -164,34 +240,52 @@ export default function App() {
               </div>
             </div>
           </div>
+        </section> */}
+
+        <section>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Public Art Map</h2>
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <MapContainer
+              center={[41.3083, -72.9279]}
+              zoom={13}
+              scrollWheelZoom={false}
+              className="h-96 w-full"
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              {publicArtLocations.map((art) => (
+                <Marker key={art.id} position={art.position}>
+                  <Popup>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold">{art.name}</h3>
+                      <p className="text-sm">{art.description}</p>
+                      <p className="text-xs text-gray-500">Installed: {art.year}</p>
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+            <div className="p-6">
+              <p className="text-gray-600 mb-4">
+                Explore New Haven's public art installations through our interactive map
+              </p>
+              <div className="flex space-x-4">
+                <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center">
+                  <MapIcon className="h-5 w-5 mr-2" />
+                  View Full Map
+                </button>
+                <button className="border border-blue-600 text-blue-600 px-6 py-2 rounded-lg hover:bg-blue-50">
+                  Contribute Artwork
+                </button>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white mt-16">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="font-semibold mb-4">Contact</h3>
-              <p className="text-gray-400">
-                1156 Chapel Street<br />
-                New Haven, CT 06510
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Calendars</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-blue-400">Public Events</a></li>
-                <li><a href="#" className="hover:text-blue-400">Community Calendar</a></li>
-                <li><a href="#" className="hover:text-blue-400">Exhibitions</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
-            <p>Yale School of Art © {new Date().getFullYear()}</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

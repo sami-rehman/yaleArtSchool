@@ -32,19 +32,6 @@ export default function Navbar() {
                         ))}
                     </div>
                 </div>
-
-                <div className="mt-4 md:mt-0 w-full md:w-auto flex items-center justify-between space-x-4">
-                    <Link
-                        to="/apply"
-                        className="text-blue-600 hover:text-blue-700 font-medium px-4 py-2"
-                    >
-                        Apply
-                    </Link>
-                    <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center">
-                        <PencilSquareIcon className="h-5 w-5 mr-2" />
-                        Edit Content
-                    </button>
-                </div>
             </div>
         </nav>
     );
